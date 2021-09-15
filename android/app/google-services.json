@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "517220518462",
+    "project_id": "instant-music-d8ff9",
+    "storage_bucket": "instant-music-d8ff9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517220518462:android:913e9154afeb7564791f6f",
+        "android_client_info": {
+          "package_name": "com.instantmusic.instant_music"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "517220518462-bmrsic71slk28g4b4k6jr7frcqtb5re5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzfpleF_sojjt-k9DLaIz7ZPHqMjm3_No"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "517220518462-bmrsic71slk28g4b4k6jr7frcqtb5re5.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "517220518462-e5icbcpc6glqtdu7lcfme8ef6netdhre.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.instantmusic.instantMusic"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
