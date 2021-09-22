@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:instant_music/scenes/login/login_scene.dart';
 import 'package:instant_music/scenes/login/login_view_model.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +23,9 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'Instant Music',
             theme: ThemeData(
-              primarySwatch: Colors.blue,
+              textTheme: GoogleFonts.quicksandTextTheme(
+                Theme.of(context).textTheme,
+              ),
             ),
             home: LoginScene(),
           );
