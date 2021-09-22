@@ -27,11 +27,7 @@ class LoginScene extends StatelessWidget {
                         child: Container(
                           width: 200,
                           height: 200,
-                          color: Colors.amber,
-                          child: const Text(
-                            'Image Placeholder',
-                            style: TextStyle(fontWeight: FontWeight.w800),
-                          ),
+                          child: Image.asset(AppStrings.SQUARE_LOGO),
                         ),
                       ),
                     ],
