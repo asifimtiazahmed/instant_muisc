@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:instant_music/resources/app_colors.dart';
 import 'package:instant_music/resources/app_strings.dart';
+import 'package:instant_music/resources/app_styles.dart';
 import 'package:instant_music/widgets/button.dart';
 import 'package:provider/provider.dart';
 
@@ -13,9 +15,11 @@ class LoginScene extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Consumer<LoginViewModel>(
       builder: (context, vm, child) {
         return Scaffold(
+          backgroundColor: AppColors.background,
           body: SafeArea(
             child: Column(
               children: [
@@ -23,13 +27,26 @@ class LoginScene extends StatelessWidget {
                   flex: 1,
                   child: Column(
                     children: [
-                      Center(
-                        child: Container(
-                          width: 200,
-                          height: 200,
-                          child: Image.asset(AppStrings.SQUARE_LOGO),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            top: size.height * 0.1, bottom: 0.05),
+                        child: Center(
+                          child: Container(
+                            width: 166,
+                            height: 48,
+                            child: Image.asset(AppStrings.HORIZONTAL_LOGO),
+                          ),
                         ),
                       ),
+                      Container(
+                          height: 54,
+                          width: 232,
+                          child: Text(
+                            AppStrings.TAG_LINE,
+                            style: AppStyles.bodyText
+                                .copyWith(color: AppColors.text),
+                            maxLines: 2,
+                          )),
                     ],
                   ),
                 ),
