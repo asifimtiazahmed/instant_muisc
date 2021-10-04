@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:instant_music/scenes/login/login_scene.dart';
 import 'package:instant_music/scenes/login/login_view_model.dart';
+import 'package:instant_music/services/app_config.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  await AppConfig.configure(); //Setup all the get it manager instances here
   runApp(const MyApp());
 }
 
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
                 Theme.of(context).textTheme,
               ),
             ),
-            home: LoginScene(),
+            home: const LoginScene(),
           );
         });
   }

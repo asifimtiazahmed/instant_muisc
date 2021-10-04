@@ -2,11 +2,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-enum ApplicationState { loggedIn, loggedOut, emailAddress, register, password }
+enum ApplicationLoginState {
+  loggedIn,
+  loggedOut,
+  emailAddress,
+  register,
+  password
+}
 
 class FirebaseAuthManager extends ChangeNotifier {
 //FIELDS
-  ApplicationState _loginState = ApplicationState.loggedOut;
+  ApplicationLoginState _loginState = ApplicationLoginState.loggedOut;
   String? _email;
 
   //METHODS
@@ -14,36 +20,45 @@ class FirebaseAuthManager extends ChangeNotifier {
     init();
   }
 
-  init() async {
+  Future<void> init() async {
     await Firebase.initializeApp();
 
     FirebaseAuth.instance.userChanges().listen((user) {
+      print('checking if user exists');
       if (user != null) {
-        _loginState = ApplicationState.loggedIn;
+        _loginState = ApplicationLoginState.loggedIn;
+        print('user found');
       } else {
-        _loginState = ApplicationState.loggedOut;
+        _loginState = ApplicationLoginState.loggedOut;
+        print('user not found');
       }
       notifyListeners();
     });
   }
 
   //GETTERS
-  ApplicationState get loginState => _loginState;
+  ApplicationLoginState get loginState => _loginState;
   String? get email => _email;
 
+  //SETTERS
+  void setLoginState(ApplicationLoginState x) => _loginState = x;
+
   void startLoginFlow() {
-    _loginState = ApplicationState.emailAddress;
+    _loginState = ApplicationLoginState.emailAddress;
+    notifyListeners();
   }
 
-  void verifyEmail(String email,
+  Future<void> verifyEmail(String email,
       void Function(FirebaseAuthException e) errorCallback) async {
     try {
       var methods =
           await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
       if (methods.contains('password')) {
-        _loginState = ApplicationState.password;
+        _loginState = ApplicationLoginState.password;
+        print('Application state change to password');
       } else {
-        _loginState = ApplicationState.register;
+        _loginState = ApplicationLoginState.register;
+        print('Application state change to register');
       }
       _email = email;
       notifyListeners();
@@ -63,7 +78,7 @@ class FirebaseAuthManager extends ChangeNotifier {
   }
 
   void cancelRegistration() {
-    _loginState = ApplicationState.emailAddress;
+    _loginState = ApplicationLoginState.emailAddress;
     notifyListeners();
   }
 
@@ -72,6 +87,7 @@ class FirebaseAuthManager extends ChangeNotifier {
     try {
       var credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+      await credential.user!.updateDisplayName(displayName);
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
     }
@@ -79,7 +95,7 @@ class FirebaseAuthManager extends ChangeNotifier {
 
   void sighOut() {
     FirebaseAuth.instance.signOut();
-    _loginState = ApplicationState.loggedOut;
+    _loginState = ApplicationLoginState.loggedOut;
     notifyListeners();
   }
 }

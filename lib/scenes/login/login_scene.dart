@@ -1,95 +1,192 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:instant_music/resources/app_assets.dart';
 import 'package:instant_music/resources/app_colors.dart';
 import 'package:instant_music/resources/app_strings.dart';
 import 'package:instant_music/resources/app_styles.dart';
+import 'package:instant_music/services/firebase_auth.dart';
 import 'package:instant_music/widgets/button.dart';
 import 'package:provider/provider.dart';
 
 import 'login_view_model.dart';
 
 class LoginScene extends StatelessWidget {
-  LoginScene({Key? key}) : super(key: key);
-  final _emailTextController = TextEditingController();
-  final _passwordTextController = TextEditingController();
+  const LoginScene({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+    final scrSize = MediaQuery.of(context).size;
     return Consumer<LoginViewModel>(
       builder: (context, vm, child) {
         return Scaffold(
           backgroundColor: AppColors.background,
           body: SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                            top: size.height * 0.1, bottom: 0.05),
-                        child: Center(
-                          child: Container(
-                            width: 166,
-                            height: 48,
-                            child: Image.asset(AppStrings.HORIZONTAL_LOGO),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    flex: vm.tagLineFlexValue,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        //IMAGE LOGO
+                        Padding(
+                          padding: EdgeInsets.only(
+                              top: scrSize.height * 0.1,
+                              bottom: scrSize.height * 0.02),
+                          child: Center(
+                            child: SizedBox(
+                              width: 166,
+                              height: 48,
+                              child: Image.asset(AppAssets.HORIZONTAL_LOGO),
+                            ),
                           ),
                         ),
-                      ),
-                      Container(
-                          height: 54,
-                          width: 232,
+                        //TEXT TAG LINE
+                        if (vm.showTagMesssage)
+                          SizedBox(
+                            height: 54,
+                            width: 232,
+                            child: Text(
+                              AppStrings.TAG_LINE,
+                              style: AppStyles.bodyText
+                                  .copyWith(color: AppColors.text, height: 1.6),
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    flex: vm.buttonFlexValue,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: scrSize.height * 0.05),
                           child: Text(
-                            AppStrings.TAG_LINE,
-                            style: AppStyles.bodyText
-                                .copyWith(color: AppColors.text),
-                            maxLines: 2,
-                          )),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Text(AppStrings.LOGIN_TITLE),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: _emailTextController,
-                        decoration: const InputDecoration(
-                          hintText: 'Email',
+                            AppStrings.LOGIN_TITLE,
+                            style: AppStyles.subTitle
+                                .copyWith(color: AppColors.primary),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      ActiveButton(
-                        title: 'Continue',
-                        onPressed: () => print('button pressed'),
-                        customTextColor: Colors.black,
-                        backgroundColor: Colors.amber,
-                        isCustomBgColor: true,
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Container(
-                              height: 2, width: 50, color: Colors.black38),
-                          const SizedBox(width: 20),
-                          const Text('Or'),
-                          const SizedBox(width: 20),
-                          Container(
-                              height: 2, width: 50, color: Colors.black38),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                    ],
-                  ),
-                )
-              ],
+                        const SizedBox(height: 10),
+                        TextField(
+                          controller: vm.emailTextController,
+                          onSubmitted: (value) {
+                            vm.inputTextOnSubmitted();
+                            // vm.validateEmail(value);
+                            // vm.updateUI();
+                          },
+                          decoration: InputDecoration(
+                            hintText: AppStrings.EMAIL,
+                            hintStyle: const TextStyle(
+                                color: AppColors.inactiveBtnText),
+                            errorText:
+                                (vm.errorText == '') ? null : vm.errorText,
+                            errorStyle: const TextStyle(
+                              color: AppColors.accentBusy,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Visibility(
+                          visible: vm.showPasswordTextField,
+                          child: TextField(
+                            //PASSWORD
+                            controller: vm.passwordTextController,
+                            onSubmitted: (_) {
+                              vm.inputTextOnSubmitted();
+                            },
+                            onChanged: (_) {
+                              vm.inputTextOnSubmitted();
+                            },
+                            decoration: InputDecoration(
+                              hintText: AppStrings.PASSWORD,
+                              hintStyle: const TextStyle(
+                                  color: AppColors.inactiveBtnText),
+                              errorText: (vm.passwordError == '')
+                                  ? null
+                                  : vm.passwordError,
+                              errorStyle: const TextStyle(
+                                color: AppColors.accentBusy,
+                              ),
+                            ),
+                            obscureText: true,
+                          ),
+                        ),
+                        Visibility(
+                          visible: vm.showPasswordVerifyTextField,
+                          child: TextField(
+                            controller: vm.verifyPasswordTextController,
+                            onSubmitted: (_) {
+                              vm.inputTextOnSubmitted();
+                            },
+                            onChanged: (_) {
+                              vm.inputTextOnSubmitted();
+                            },
+                            decoration: InputDecoration(
+                              hintText: AppStrings.RE_PASSWORD,
+                              hintStyle: const TextStyle(
+                                  color: AppColors.inactiveBtnText),
+                              errorText:
+                                  (vm.verifyPasswordTextController.text == '')
+                                      ? null
+                                      : vm.verifyPasswordTextFieldError,
+                              errorStyle: const TextStyle(
+                                color: AppColors.accentBusy,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        ActiveButton(
+                          title: vm.btnTitle,
+                          width: 225,
+                          onPressed: () {
+                            vm.inputTextOnSubmitted();
+                          },
+                          customTextColor: vm.btnTextColor,
+                          backgroundColor: vm.btnBackgroundColor,
+                          isCustomBgColor: true,
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Container(
+                                height: 1,
+                                width: scrSize.width * 0.30,
+                                color: Colors.black38),
+                            SizedBox(width: scrSize.width * 0.05),
+                            const Text(AppStrings.OR),
+                            SizedBox(width: scrSize.width * 0.05),
+                            Container(
+                                height: 1,
+                                width: scrSize.width * 0.30,
+                                color: Colors.black38),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        ActiveButton(
+                            title: (vm.authManager.loginState ==
+                                    ApplicationLoginState.loggedIn)
+                                ? 'Log out'
+                                : 'Not logged in',
+                            customTextColor: Colors.black,
+                            isCustomBgColor: true,
+                            backgroundColor: Colors.yellow,
+                            onPressed: () {
+                              vm.authManager.sighOut();
+                            }),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         );
