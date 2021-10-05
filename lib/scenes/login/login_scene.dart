@@ -4,7 +4,7 @@ import 'package:instant_music/resources/app_assets.dart';
 import 'package:instant_music/resources/app_colors.dart';
 import 'package:instant_music/resources/app_strings.dart';
 import 'package:instant_music/resources/app_styles.dart';
-import 'package:instant_music/services/firebase_auth.dart';
+import 'package:instant_music/scenes/login/widgets/social_button.dart';
 import 'package:instant_music/widgets/button.dart';
 import 'package:provider/provider.dart';
 
@@ -142,7 +142,7 @@ class LoginScene extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         ActiveButton(
                           title: vm.btnTitle,
                           width: 225,
@@ -153,7 +153,7 @@ class LoginScene extends StatelessWidget {
                           backgroundColor: vm.btnBackgroundColor,
                           isCustomBgColor: true,
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -170,18 +170,20 @@ class LoginScene extends StatelessWidget {
                                 color: Colors.black38),
                           ],
                         ),
-                        const SizedBox(height: 10),
-                        ActiveButton(
-                            title: (vm.authManager.loginState ==
-                                    ApplicationLoginState.loggedIn)
-                                ? 'Log out'
-                                : 'Not logged in',
-                            customTextColor: Colors.black,
-                            isCustomBgColor: true,
-                            backgroundColor: Colors.yellow,
-                            onPressed: () {
-                              vm.authManager.sighOut();
-                            }),
+                        const SizedBox(height: 30),
+                        //Google Sign-in Button
+                        SocialButton(
+                          imageAsset: AppAssets.GOOGLE_LOGO,
+                          onTap: () {},
+                          text: AppStrings.SIGN_IN_GOOGLE,
+                        ),
+                        const SizedBox(height: 20),
+                        //Facebook Sign-in Button
+                        SocialButton(
+                          imageAsset: AppAssets.FACEBOOK_LOGO,
+                          onTap: () {},
+                          text: AppStrings.SIGN_IN_FACEBOOK,
+                        ),
                       ],
                     ),
                   )

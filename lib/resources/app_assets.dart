@@ -4,4 +4,6 @@ class AppAssets {
   static const String HORIZONTAL_LOGO = 'assets/logo/imHorizontalLogo.png';
   static const String COIN_COLOR = 'assets/images/coin_color.png';
   static const String COIN_BW = 'assets/images/coin_bw.png';
+  static const String GOOGLE_LOGO = 'assets/logo/logos_google-icon.png';
+  static const String FACEBOOK_LOGO = 'assets/logo/logos_facebook.png';
 }

@@ -6,7 +6,10 @@ static const String TAG_LINE = 'A musical mentoring platform for students and te
 static const String SIGN_IN_GOOGLE = 'Sign in with Google';
 static const String SIGN_IN_FACEBOOK = 'Sign in with Facebook';
 
-
+//LOGIN VIEW MODEL
+static const String PASSWORD_CANNOT_BLANK= 'password cannot be blank';
+static const String PASSWORD_MUST_BE_SIX = 'password must be over 6 characters long';
+static const String PASSWORD_MUST_MATCH = 'password must match!';
 //HINT TEXT
 static const String EMAIL = 'Email';
 static const String PASSWORD = 'Password';

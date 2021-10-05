@@ -8,7 +8,6 @@ class LoginViewModel extends ChangeNotifier {
   final emailTextController = TextEditingController();
   final passwordTextController = TextEditingController();
   final verifyPasswordTextController = TextEditingController();
-  //String verifyPasswordTextField = '';
   String passwordError = '';
   String verifyPasswordTextFieldError = '';
   String errorText = '';
@@ -72,7 +71,7 @@ class LoginViewModel extends ChangeNotifier {
     //Initial state
     if (authManager.loginState == ApplicationLoginState.emailAddress ||
         authManager.loginState == ApplicationLoginState.loggedOut) {
-      print('initial state + ${authManager.loginState}');
+      //print('initial state + ${authManager.loginState}');
       showTagMesssage = true;
       tagLineFlexValue = 1;
       buttonFlexValue = 2;
@@ -85,8 +84,8 @@ class LoginViewModel extends ChangeNotifier {
     }
     if (authManager.loginState == ApplicationLoginState.password &&
         !isPasswordValid) {
-      print(
-          'Typed in Email (regcoglized as a past user) but not password or Password not valid  + ${authManager.loginState}');
+      // print(
+      //     'Typed in Email (regcoglized as a past user) but not password or Password not valid  + ${authManager.loginState}');
       showTagMesssage = false;
       tagLineFlexValue = 1;
       buttonFlexValue = 3;
@@ -100,8 +99,8 @@ class LoginViewModel extends ChangeNotifier {
     if (authManager.loginState == ApplicationLoginState.password &&
         isPasswordValid &&
         isEmailValid) {
-      print(
-          'User recognized, new need a valid passowrd  + ${authManager.loginState}');
+      // print(
+      //     'User recognized, new need a valid passowrd  + ${authManager.loginState}');
       showTagMesssage = false;
       tagLineFlexValue = 1;
       buttonFlexValue = 3;
@@ -116,7 +115,7 @@ class LoginViewModel extends ChangeNotifier {
       showPasswordVerifyTextField = false;
     }
     if (authManager.loginState == ApplicationLoginState.register) {
-      print('just application state is register + ${authManager.loginState}');
+      // print('just application state is register + ${authManager.loginState}');
       showTagMesssage = false;
       tagLineFlexValue = 1;
       buttonFlexValue = 3;
@@ -149,7 +148,7 @@ class LoginViewModel extends ChangeNotifier {
         !isEmailValid) {
       tagLineFlexValue = 1;
       buttonFlexValue = 3;
-      print('register + valid email + ${authManager.loginState}');
+      //print('register + valid email + ${authManager.loginState}');
       showPasswordTextField = false;
       showPasswordVerifyTextField = false;
       btnBackgroundColor =
@@ -183,9 +182,9 @@ class LoginViewModel extends ChangeNotifier {
 //This method is verifying the first password field
   void validatePassword(value) {
     if (value == null || value == '') {
-      passwordError = 'password cannot be blank';
+      passwordError = AppStrings.PASSWORD_CANNOT_BLANK;
     } else if (value.length < 6) {
-      passwordError = 'password must be over 6 characters long';
+      passwordError = AppStrings.PASSWORD_MUST_BE_SIX;
     } else if (value.length >= 6) {
       passwordError = '';
       isPasswordValid = true;
@@ -196,13 +195,13 @@ class LoginViewModel extends ChangeNotifier {
 //This method is for the verifying of secondary password field
   void verifyPassword(value) {
     if (value == null || value == '') {
-      verifyPasswordTextFieldError = 'password cannot be blank';
+      verifyPasswordTextFieldError = AppStrings.PASSWORD_CANNOT_BLANK;
       isPasswordValid = false;
     } else if (value.length < 6) {
-      verifyPasswordTextFieldError = 'password must be over 6 characters long';
+      verifyPasswordTextFieldError = AppStrings.PASSWORD_MUST_BE_SIX;
       isPasswordValid = false;
     } else if (value != passwordTextController.text) {
-      verifyPasswordTextFieldError = 'Password must match!';
+      verifyPasswordTextFieldError = AppStrings.PASSWORD_MUST_MATCH;
       isPasswordValid = false;
     } else if (value == passwordTextController.text && value.length >= 6) {
       verifyPasswordTextFieldError = '';
@@ -232,7 +231,7 @@ class LoginViewModel extends ChangeNotifier {
     } else if (regex.hasMatch(value)) {
       errorText = '';
       isEmailValid = true;
-      print('verify email called from validateEmail method');
+      //print('verify email called from validateEmail method');
       await authManager.verifyEmail(value, (e) {
         print(e);
       });
@@ -241,7 +240,7 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   void login() {
-    print('login function called');
+    //  print('login function called');
     if (isEmailValid &&
         isPasswordValid &&
         emailTextController.text.isNotEmpty &&

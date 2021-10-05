@@ -55,10 +55,10 @@ class FirebaseAuthManager extends ChangeNotifier {
           await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
       if (methods.contains('password')) {
         _loginState = ApplicationLoginState.password;
-        print('Application state change to password');
+        //print('Application state change to password');
       } else {
         _loginState = ApplicationLoginState.register;
-        print('Application state change to register');
+        //print('Application state change to register');
       }
       _email = email;
       notifyListeners();
