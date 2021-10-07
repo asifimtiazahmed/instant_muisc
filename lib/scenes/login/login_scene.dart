@@ -181,7 +181,10 @@ class LoginScene extends StatelessWidget {
                         //Facebook Sign-in Button
                         SocialButton(
                           imageAsset: AppAssets.FACEBOOK_LOGO,
-                          onTap: () {},
+                          onTap: () async {
+                            print('trying to login to fb');
+                            await vm.facebookSignIn();
+                          },
                           text: AppStrings.SIGN_IN_FACEBOOK,
                         ),
                       ],

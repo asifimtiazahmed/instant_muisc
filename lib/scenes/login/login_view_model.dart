@@ -239,6 +239,10 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> facebookSignIn()async{
+    await authManager.facebookLogin();
+  }
+
   void login() {
     //  print('login function called');
     if (isEmailValid &&
