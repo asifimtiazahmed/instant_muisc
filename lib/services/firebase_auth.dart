@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 enum ApplicationLoginState {
   loggedIn,
@@ -17,7 +19,12 @@ class FirebaseAuthManager extends ChangeNotifier {
   String? _email;
   late AccessToken accessToken;
   bool isFacebookLoggedIn = false;
-
+  bool isGoogleSignedIn = false;
+  bool isAppleSignedIn = false;
+  bool hasCompletedOnboarding = false;
+  final googleSignIn = GoogleSignIn();
+  GoogleSignInAccount? _user;
+  GoogleSignInAccount get user => _user!;
   //METHODS
   FirebaseAuthManager() {
     init();
@@ -37,6 +44,28 @@ class FirebaseAuthManager extends ChangeNotifier {
       }
       notifyListeners();
     });
+  }
+
+  Future<void> googleLogin() async {
+    final googleUser = await googleSignIn.signIn();
+    if (googleUser == null) {
+      print('no google user??');
+      return;
+    }
+    _user = googleUser;
+    _loginState = ApplicationLoginState.emailAddress;
+
+    final googleAuth = await googleUser.authentication;
+    final credential =
+        GoogleAuthProvider.credential(accessToken: googleAuth.idToken);
+
+    try {
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      _loginState = ApplicationLoginState.loggedIn;
+    } catch (e) {
+      print('could not sign in with goodle creds, and heres why: \n $e');
+    }
+    notifyListeners();
   }
 
   //GETTERS
@@ -70,6 +99,20 @@ class FirebaseAuthManager extends ChangeNotifier {
     }
   }
 
+//THIS METHOD IS CURRENTLY UNUSED, BECAUSE IT WILL REQUIRE A PAID
+// MEMBERSHIP TO APPLE, THEN GOTO THE API DPCS FOR THIS PLUGIN AND
+// GET THE REMAINING IMPLEMENTATION DONE FROM THERE.
+  Future<void> appleLogin() async {
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+    );
+
+    print(credential);
+  }
+
   Future<void> facebookLogin() async {
     final LoginResult result = await FacebookAuth.instance
         .login(); // by default we request the email and the public profile
@@ -83,6 +126,7 @@ class FirebaseAuthManager extends ChangeNotifier {
       print(result.status);
       print(result.message);
     }
+    notifyListeners();
   }
 
   Future<void> checkFacebookLoggedIn() async {

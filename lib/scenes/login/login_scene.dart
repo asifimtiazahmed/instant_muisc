@@ -7,11 +7,12 @@ import 'package:instant_music/resources/app_styles.dart';
 import 'package:instant_music/scenes/login/widgets/social_button.dart';
 import 'package:instant_music/widgets/button.dart';
 import 'package:provider/provider.dart';
-
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'login_view_model.dart';
 
 class LoginScene extends StatelessWidget {
   const LoginScene({Key? key}) : super(key: key);
+  static const String routeName = 'loginScene';
 
   @override
   Widget build(BuildContext context) {
@@ -174,10 +175,13 @@ class LoginScene extends StatelessWidget {
                         //Google Sign-in Button
                         SocialButton(
                           imageAsset: AppAssets.GOOGLE_LOGO,
-                          onTap: () {},
+                          onTap: () async {
+                            print('trying google sign in');
+                            await vm.googleSignIn();
+                          },
                           text: AppStrings.SIGN_IN_GOOGLE,
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
                         //Facebook Sign-in Button
                         SocialButton(
                           imageAsset: AppAssets.FACEBOOK_LOGO,
@@ -186,6 +190,14 @@ class LoginScene extends StatelessWidget {
                             await vm.facebookSignIn();
                           },
                           text: AppStrings.SIGN_IN_FACEBOOK,
+                        ),
+                        const SizedBox(height: 15),
+                        SocialButton(
+                          imageAsset: AppAssets.APPLE_LOGO,
+                          onTap: () async {
+                            print('trying to login with Apple');
+                          },
+                          text: AppStrings.SIGN_IN_APPLE,
                         ),
                       ],
                     ),

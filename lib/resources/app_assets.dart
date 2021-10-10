@@ -6,4 +6,5 @@ class AppAssets {
   static const String COIN_BW = 'assets/images/coin_bw.png';
   static const String GOOGLE_LOGO = 'assets/logo/logos_google-icon.png';
   static const String FACEBOOK_LOGO = 'assets/logo/logos_facebook.png';
+  static const String APPLE_LOGO = 'assets/logo/appleLogo.png';
 }

@@ -239,8 +239,12 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> facebookSignIn()async{
+  Future<void> facebookSignIn() async {
     await authManager.facebookLogin();
+  }
+
+  Future<void> googleSignIn() async {
+    await authManager.googleLogin();
   }
 
   void login() {

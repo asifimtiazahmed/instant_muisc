@@ -66,5 +66,20 @@
           <string>fbauth2</string>
           <string>fbshareextension</string>
         </array>
+   <!-- Put me in the [my_project]/ios/Runner/Info.plist file -->
+   <!-- Google Sign-in Section -->
+   <key>CFBundleURLTypes</key>
+   <array>
+   	<dict>
+   		<key>CFBundleTypeRole</key>
+   		<string>Editor</string>
+   		<key>CFBundleURLSchemes</key>
+   		<array>
+   			<!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
+   			<string>com.googleusercontent.apps.517220518462-e5icbcpc6glqtdu7lcfme8ef6netdhre</string>
+   		</array>
+   	</dict>
+   </array>
+   <!-- End of the Google Sign-in Section -->
 </dict>
 </plist>

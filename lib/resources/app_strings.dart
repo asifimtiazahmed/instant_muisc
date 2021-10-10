@@ -5,6 +5,7 @@ static const String LOGIN_TITLE = 'Log in or sign up for free';
 static const String TAG_LINE = 'A musical mentoring platform for students and teachers';
 static const String SIGN_IN_GOOGLE = 'Sign in with Google';
 static const String SIGN_IN_FACEBOOK = 'Sign in with Facebook';
+static const String SIGN_IN_APPLE = 'Sign in with Apple';
 
 //LOGIN VIEW MODEL
 static const String PASSWORD_CANNOT_BLANK= 'password cannot be blank';
