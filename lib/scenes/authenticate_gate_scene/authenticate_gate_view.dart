@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 class AuthenticationGateView extends StatelessWidget {
   static const routeName = '/';
 
-  AuthenticationGateView({Key? key}) : super(key: key);
+  const AuthenticationGateView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

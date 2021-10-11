@@ -56,12 +56,15 @@ class FirebaseAuthManager extends ChangeNotifier {
     _loginState = ApplicationLoginState.emailAddress;
 
     final googleAuth = await googleUser.authentication;
-    final credential =
-        GoogleAuthProvider.credential(accessToken: googleAuth.idToken);
-
+    final credential = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken, accessToken: googleAuth.accessToken);
+    print('google cred => $credential\n');
     try {
       await FirebaseAuth.instance.signInWithCredential(credential);
       _loginState = ApplicationLoginState.loggedIn;
+      isGoogleSignedIn = true;
+      print(_loginState);
+      print('${googleUser.displayName}');
     } catch (e) {
       print('could not sign in with goodle creds, and heres why: \n $e');
     }
@@ -114,12 +117,18 @@ class FirebaseAuthManager extends ChangeNotifier {
   }
 
   Future<void> facebookLogin() async {
-    final LoginResult result = await FacebookAuth.instance
-        .login(); // by default we request the email and the public profile
+    late LoginResult result;
+    try {
+      result = await FacebookAuth.instance.login();
+    } catch (e) {
+      print('could not login to facebook and this is why: \n $e');
+    }
+    // by default we request the email and the public profile
 // or FacebookAuth.i.login()
     if (result.status == LoginStatus.success) {
       // you are logged
       _loginState = ApplicationLoginState.loggedIn;
+      isFacebookLoggedIn = true;
       print('SUCCESS!! FB Login');
       accessToken = result.accessToken!;
     } else {

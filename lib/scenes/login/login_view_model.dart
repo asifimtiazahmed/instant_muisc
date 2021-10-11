@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:instant_music/resources/app_colors.dart';
 import 'package:instant_music/resources/app_strings.dart';
 import 'package:instant_music/services/firebase_auth.dart';
+import 'package:email_validator/email_validator.dart';
 
 class LoginViewModel extends ChangeNotifier {
   final emailTextController = TextEditingController();
@@ -15,7 +16,8 @@ class LoginViewModel extends ChangeNotifier {
   bool isPasswordValid = false;
   bool isVeryfyPasswordObscured = true;
   bool passwordObscured = true;
-  bool isVeryPasswordValid = false;
+  bool isVeryPasswordValid =
+      false; //THIS SHOULD NOT BE USED FOR ANY DECISION MAKING IN TERMS OF METHOD
   Color btnBackgroundColor = AppColors.secondaryInactive;
   Color btnTextColor = AppColors.inactiveBtnText;
   String btnTitle = AppStrings.BTN_CONTINUE;
@@ -53,16 +55,51 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   void submit() async {
-    await inputTextOnSubmitted();
-    (authManager.loginState == ApplicationLoginState.register)
-        ? register()
-        : login();
+    //await inputTextOnSubmitted();
+    if (authManager.loginState == ApplicationLoginState.loggedIn) {
+      print('submit called, trying to log out now');
+      logOut();
+    } else if (isEmailValid && isPasswordValid) {
+      if (authManager.loginState == ApplicationLoginState.register) {
+        register();
+      } else if (authManager.loginState == ApplicationLoginState.password) {
+        login();
+      } else {
+        await updateUI();
+      }
+    }
+
+    print(authManager.loginState);
+    notifyListeners();
   }
 
-  inputTextOnSubmitted() async {
+  Future<void> forContinueButton(value) async {
+    var isValid = checkEmail(value);
+    if (isValid) {
+      print('valid');
+      await authManager.verifyEmail(value, (e) {});
+      if (authManager.loginState == ApplicationLoginState.password) {
+        btnBackgroundColor = AppColors.primary;
+        btnTextColor = AppColors.btnText;
+        btnTitle = AppStrings.BTN_LOGIN;
+      } else {
+        btnBackgroundColor = AppColors.primary;
+        btnTextColor = AppColors.btnText;
+        btnTitle = AppStrings.BTN_SIGNUP;
+      }
+    } else {
+      await updateUI();
+      print('${authManager.loginState}');
+    }
+    notifyListeners();
+  }
+
+  Future<void> inputTextOnSubmitted() async {
     await validateEmail(emailTextController.text);
     validatePassword(passwordTextController.text);
     verifyPassword(verifyPasswordTextController.text);
+    print(
+        'current status \n isEmailValid: $isEmailValid\n${emailTextController.text}\n\n isPasswordValid: $isPasswordValid\n${passwordTextController.text}\n\n\n\n now calling update UI');
     await updateUI();
   }
 
@@ -176,6 +213,11 @@ class LoginViewModel extends ChangeNotifier {
       showPasswordTextField = true;
       showPasswordVerifyTextField = true;
     }
+    if (authManager.loginState == ApplicationLoginState.loggedIn) {
+      btnTitle = AppStrings.BTN_LOGOUT;
+      btnBackgroundColor = AppColors.primary;
+      btnTextColor = AppColors.btnText;
+    }
     notifyListeners();
   }
 
@@ -206,8 +248,14 @@ class LoginViewModel extends ChangeNotifier {
     } else if (value == passwordTextController.text && value.length >= 6) {
       verifyPasswordTextFieldError = '';
       isPasswordValid = true;
+      isVeryPasswordValid = true;
     }
     notifyListeners();
+  }
+
+  bool checkEmail(value) {
+    return isEmailValid = EmailValidator.validate(value);
+    //print('from check email -> $isEmailValid');
   }
 
   Future<void> validateEmail(value) async {
@@ -224,11 +272,11 @@ class LoginViewModel extends ChangeNotifier {
       errorText = 'Please enter a valid email address';
       isEmailValid = false;
       //  authManager.setLoginState(ApplicationLoginState.emailAddress);
-    } else if (authManager.loginState == ApplicationLoginState.password) {
-      errorText = 'User with that email already exists';
-      isEmailValid = false;
+      // } else if (authManager.loginState == ApplicationLoginState.password) {
+      //   errorText = 'User with that email already exists';
+      //   isEmailValid = false;
       //  authManager.setLoginState(ApplicationLoginState.emailAddress);
-    } else if (regex.hasMatch(value)) {
+    } else if (regex.hasMatch(value) && checkEmail(value)) {
       errorText = '';
       isEmailValid = true;
       //print('verify email called from validateEmail method');
@@ -247,7 +295,7 @@ class LoginViewModel extends ChangeNotifier {
     await authManager.googleLogin();
   }
 
-  void login() {
+  void login() async {
     //  print('login function called');
     if (isEmailValid &&
         isPasswordValid &&
@@ -258,11 +306,11 @@ class LoginViewModel extends ChangeNotifier {
         print(e);
       });
     }
-    reset();
+    await reset();
     notifyListeners();
   }
 
-  void reset() {
+  Future<void> reset() async {
     emailTextController.clear();
     passwordTextController.clear();
     passwordError = '';
@@ -270,6 +318,7 @@ class LoginViewModel extends ChangeNotifier {
     showPasswordTextField = false;
     isEmailValid = false;
     isPasswordValid = false;
+    await updateUI();
 
     notifyListeners();
   }
@@ -296,11 +345,11 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void logOut() {
+  void logOut() async {
     if (authManager.loginState == ApplicationLoginState.loggedIn) {
       print('signing out user');
       authManager.sighOut();
-      reset();
+      await reset();
       notifyListeners();
     }
   }

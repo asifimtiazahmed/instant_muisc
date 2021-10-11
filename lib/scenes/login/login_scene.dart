@@ -7,7 +7,6 @@ import 'package:instant_music/resources/app_styles.dart';
 import 'package:instant_music/scenes/login/widgets/social_button.dart';
 import 'package:instant_music/widgets/button.dart';
 import 'package:provider/provider.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'login_view_model.dart';
 
 class LoginScene extends StatelessWidget {
@@ -76,6 +75,9 @@ class LoginScene extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextField(
+                          onChanged: (value) async {
+                            await vm.forContinueButton(value);
+                          },
                           controller: vm.emailTextController,
                           onSubmitted: (value) {
                             vm.inputTextOnSubmitted();
@@ -144,11 +146,14 @@ class LoginScene extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 20),
+                        //CONTINUE
                         ActiveButton(
                           title: vm.btnTitle,
                           width: 225,
-                          onPressed: () {
-                            vm.inputTextOnSubmitted();
+                          onPressed: () async {
+                            await vm.inputTextOnSubmitted();
+                            vm.submit();
+                            //vm.submit
                           },
                           customTextColor: vm.btnTextColor,
                           backgroundColor: vm.btnBackgroundColor,

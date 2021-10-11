@@ -18,5 +18,6 @@ static const String RE_PASSWORD = 'Re-enter Password';
 static const String BTN_CONTINUE = 'Continue';
 static const String BTN_SIGNUP = 'Sign Up';
 static const String BTN_LOGIN = 'Login';
+static const String BTN_LOGOUT = 'Logout';
 static const String OR = 'OR';
 }
