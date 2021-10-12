@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:instant_music/resources/app_colors.dart';
 import 'package:instant_music/resources/app_strings.dart';
+import 'package:instant_music/scenes/email_verification/email_verify_scene.dart';
+import 'package:instant_music/scenes/root_scene/root_view.dart';
 import 'package:instant_music/services/firebase_auth.dart';
 import 'package:email_validator/email_validator.dart';
 
@@ -30,6 +32,7 @@ class LoginViewModel extends ChangeNotifier {
   final authManager = GetIt.I<FirebaseAuthManager>();
   LoginViewModel() {
     authManager.init();
+    updateUI();
   }
   @override
   dispose() {
@@ -54,19 +57,20 @@ class LoginViewModel extends ChangeNotifier {
     return btnBackgroundColor;
   }
 
-  void submit() async {
+  void submit(BuildContext context) async {
     //await inputTextOnSubmitted();
     if (authManager.loginState == ApplicationLoginState.loggedIn) {
       print('submit called, trying to log out now');
       logOut();
     } else if (isEmailValid && isPasswordValid) {
       if (authManager.loginState == ApplicationLoginState.register) {
-        register();
+        register(context);
       } else if (authManager.loginState == ApplicationLoginState.password) {
-        login();
+        login(context);
       } else {
         await updateUI();
       }
+      await updateUI();
     }
 
     print(authManager.loginState);
@@ -76,7 +80,6 @@ class LoginViewModel extends ChangeNotifier {
   Future<void> forContinueButton(value) async {
     var isValid = checkEmail(value);
     if (isValid) {
-      print('valid');
       await authManager.verifyEmail(value, (e) {});
       if (authManager.loginState == ApplicationLoginState.password) {
         btnBackgroundColor = AppColors.primary;
@@ -87,6 +90,8 @@ class LoginViewModel extends ChangeNotifier {
         btnTextColor = AppColors.btnText;
         btnTitle = AppStrings.BTN_SIGNUP;
       }
+    } else if (emailTextController.text == '') {
+      reset();
     } else {
       await updateUI();
       print('${authManager.loginState}');
@@ -125,7 +130,7 @@ class LoginViewModel extends ChangeNotifier {
       //     'Typed in Email (regcoglized as a past user) but not password or Password not valid  + ${authManager.loginState}');
       showTagMesssage = false;
       tagLineFlexValue = 1;
-      buttonFlexValue = 3;
+      buttonFlexValue = 4;
       btnBackgroundColor = AppColors.secondaryInactive;
       btnTextColor = AppColors.inactiveBtnText;
       btnTitle = AppStrings.BTN_LOGIN;
@@ -140,7 +145,7 @@ class LoginViewModel extends ChangeNotifier {
       //     'User recognized, new need a valid passowrd  + ${authManager.loginState}');
       showTagMesssage = false;
       tagLineFlexValue = 1;
-      buttonFlexValue = 3;
+      buttonFlexValue = 4;
       btnBackgroundColor =
           (isEmailValid && isPasswordValid && isVeryPasswordValid)
               ? AppColors.primary
@@ -155,7 +160,7 @@ class LoginViewModel extends ChangeNotifier {
       // print('just application state is register + ${authManager.loginState}');
       showTagMesssage = false;
       tagLineFlexValue = 1;
-      buttonFlexValue = 3;
+      buttonFlexValue = 4;
       btnBackgroundColor = (isEmailValid && isPasswordValid)
           ? AppColors.primary
           : AppColors.secondaryInactive;
@@ -170,7 +175,7 @@ class LoginViewModel extends ChangeNotifier {
     if (authManager.loginState == ApplicationLoginState.password) {
       showTagMesssage = false;
       tagLineFlexValue = 1;
-      buttonFlexValue = 3;
+      buttonFlexValue = 4;
       btnBackgroundColor = (isEmailValid && isPasswordValid)
           ? AppColors.primary
           : AppColors.secondaryInactive;
@@ -184,7 +189,7 @@ class LoginViewModel extends ChangeNotifier {
     if (authManager.loginState == ApplicationLoginState.register &&
         !isEmailValid) {
       tagLineFlexValue = 1;
-      buttonFlexValue = 3;
+      buttonFlexValue = 4;
       //print('register + valid email + ${authManager.loginState}');
       showPasswordTextField = false;
       showPasswordVerifyTextField = false;
@@ -202,7 +207,7 @@ class LoginViewModel extends ChangeNotifier {
         isEmailValid) {
       showTagMesssage = false;
       tagLineFlexValue = 1;
-      buttonFlexValue = 3;
+      buttonFlexValue = 4;
       btnBackgroundColor = (isEmailValid && isPasswordValid)
           ? AppColors.primary
           : AppColors.secondaryInactive;
@@ -293,9 +298,10 @@ class LoginViewModel extends ChangeNotifier {
 
   Future<void> googleSignIn() async {
     await authManager.googleLogin();
+    notifyListeners();
   }
 
-  void login() async {
+  void login(BuildContext context) async {
     //  print('login function called');
     if (isEmailValid &&
         isPasswordValid &&
@@ -307,7 +313,7 @@ class LoginViewModel extends ChangeNotifier {
       });
     }
     await reset();
-    notifyListeners();
+    nextRoute(context);
   }
 
   Future<void> reset() async {
@@ -318,17 +324,24 @@ class LoginViewModel extends ChangeNotifier {
     showPasswordTextField = false;
     isEmailValid = false;
     isPasswordValid = false;
+    showTagMesssage = true;
     await updateUI();
 
     notifyListeners();
   }
 
-  void viewObscured() {
-    (passwordObscured) ? passwordObscured = false : passwordObscured = true;
+  void viewObscured(String whichField) {
+    if (whichField == 'password') {
+      (passwordObscured) ? passwordObscured = false : passwordObscured = true;
+    } else if (whichField == 'verifyPassword') {
+      (isVeryfyPasswordObscured)
+          ? isVeryfyPasswordObscured = false
+          : isVeryfyPasswordObscured = true;
+    }
     notifyListeners();
   }
 
-  void register() {
+  void register(BuildContext context) async {
     print('register function called');
     if (isEmailValid &&
         isPasswordValid &&
@@ -341,8 +354,23 @@ class LoginViewModel extends ChangeNotifier {
         print(e);
       });
     }
-    reset();
-    notifyListeners();
+    await reset();
+    nextRoute(context);
+  }
+
+  //This method will see if the method that was logged in was
+  //using plain email, and if so, the if the email has not been
+  // verified then it will send to email verification page
+  //else send to RootAccess
+  void nextRoute(BuildContext context) {
+    if (authManager.loginState == ApplicationLoginState.loggedIn &&
+        authManager.whichLoginMethod() != 'Email') {
+      Navigator.pushNamed(context, RootScene.routeName);
+    } else if (authManager.loginState == ApplicationLoginState.loggedIn &&
+        authManager.whichLoginMethod() == 'Email' &&
+        !authManager.emailVerified) {
+      Navigator.pushNamed(context, EmailVerifyScene.routeName);
+    }
   }
 
   void logOut() async {
@@ -350,7 +378,6 @@ class LoginViewModel extends ChangeNotifier {
       print('signing out user');
       authManager.sighOut();
       await reset();
-      notifyListeners();
     }
   }
 }

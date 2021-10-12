@@ -11,6 +11,7 @@ static const String SIGN_IN_APPLE = 'Sign in with Apple';
 static const String PASSWORD_CANNOT_BLANK= 'password cannot be blank';
 static const String PASSWORD_MUST_BE_SIX = 'password must be over 6 characters long';
 static const String PASSWORD_MUST_MATCH = 'password must match!';
+
 //HINT TEXT
 static const String EMAIL = 'Email';
 static const String PASSWORD = 'Password';
@@ -20,4 +21,9 @@ static const String BTN_SIGNUP = 'Sign Up';
 static const String BTN_LOGIN = 'Login';
 static const String BTN_LOGOUT = 'Logout';
 static const String OR = 'OR';
+
+//OTHER STRINGS
+static const String GOOGLE = 'Google';
+static const String APPLE = 'Apple';
+static const String FACEBOOK = 'Facebook';
 }

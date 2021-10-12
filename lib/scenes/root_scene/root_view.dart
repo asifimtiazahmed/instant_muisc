@@ -7,6 +7,7 @@ import 'package:instant_music/scenes/root_scene/root_view_model.dart';
 import 'package:provider/provider.dart';
 
 class RootScene extends StatelessWidget {
+  static const String routeName = 'rootScene';
   const RootScene({Key? key}) : super(key: key);
 
   @override

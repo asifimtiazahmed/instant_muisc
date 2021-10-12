@@ -18,17 +18,37 @@ class FirebaseAuthManager extends ChangeNotifier {
   ApplicationLoginState _loginState = ApplicationLoginState.loggedOut;
   String? _email;
   late AccessToken accessToken;
-  bool isFacebookLoggedIn = false;
+  bool isFacebookSignedIn = false;
   bool isGoogleSignedIn = false;
   bool isAppleSignedIn = false;
+  bool isEmailSignedIn = false;
   bool hasCompletedOnboarding = false;
   final googleSignIn = GoogleSignIn();
   GoogleSignInAccount? _user;
   GoogleSignInAccount get user => _user!;
+
   //METHODS
   FirebaseAuthManager() {
     init();
   }
+
+  //Get which method was used to signIn
+  String whichLoginMethod() {
+    if (isEmailSignedIn) {
+      return 'Email';
+    } else if (isGoogleSignedIn) {
+      return 'Google';
+    } else if (isFacebookSignedIn) {
+      return 'Facebook';
+    } else if (isAppleSignedIn) {
+      return 'Apple';
+    } else {
+      return 'unknown';
+    }
+  }
+
+  //Checks to see if the users email was verified or not
+  bool get emailVerified => FirebaseAuth.instance.currentUser!.emailVerified;
 
   Future<void> init() async {
     await Firebase.initializeApp();
@@ -37,7 +57,7 @@ class FirebaseAuthManager extends ChangeNotifier {
       print('checking if user exists');
       if (user != null) {
         _loginState = ApplicationLoginState.loggedIn;
-        print('user found');
+        print('user found $user');
       } else {
         _loginState = ApplicationLoginState.loggedOut;
         print('user not found');
@@ -112,7 +132,7 @@ class FirebaseAuthManager extends ChangeNotifier {
         AppleIDAuthorizationScopes.fullName,
       ],
     );
-
+//ALSO NEED TO SAY THAT isAppleSignedIn = true
     print(credential);
   }
 
@@ -128,7 +148,7 @@ class FirebaseAuthManager extends ChangeNotifier {
     if (result.status == LoginStatus.success) {
       // you are logged
       _loginState = ApplicationLoginState.loggedIn;
-      isFacebookLoggedIn = true;
+      isFacebookSignedIn = true;
       print('SUCCESS!! FB Login');
       accessToken = result.accessToken!;
     } else {
@@ -142,9 +162,9 @@ class FirebaseAuthManager extends ChangeNotifier {
     final AccessToken? accessToken = await FacebookAuth.instance.accessToken;
 // or FacebookAuth.i.accessToken
     if (accessToken != null) {
-      isFacebookLoggedIn = true; // user is logged
+      isFacebookSignedIn = true; // user is logged
     } else {
-      isFacebookLoggedIn = false;
+      isFacebookSignedIn = false;
     }
     notifyListeners();
   }
@@ -158,6 +178,7 @@ class FirebaseAuthManager extends ChangeNotifier {
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
+      isEmailSignedIn = true;
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
     }
@@ -174,6 +195,7 @@ class FirebaseAuthManager extends ChangeNotifier {
       var credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       await credential.user!.updateDisplayName(displayName);
+      isEmailSignedIn = true;
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
     }
@@ -181,10 +203,13 @@ class FirebaseAuthManager extends ChangeNotifier {
 
   void sighOut() async {
     FirebaseAuth.instance.signOut();
-
+    isGoogleSignedIn = false;
+    isFacebookSignedIn = false;
+    isAppleSignedIn = false;
+    isEmailSignedIn = false;
     try {
       await checkFacebookLoggedIn();
-      isFacebookLoggedIn ? facebookLogOut() : null;
+      isFacebookSignedIn ? facebookLogOut() : null;
     } catch (e) {
       print(e);
     }

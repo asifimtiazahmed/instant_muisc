@@ -45,6 +45,7 @@ dependencies:
   google_sign_in: ^5.1.1
   sign_in_with_apple: ^3.2.0
   email_validator: ^2.0.1
+  fluentui_system_icons: ^1.1.136 #https://pub.dev/packages/fluentui_system_icons/
 
 dev_dependencies:
   flutter_test:
