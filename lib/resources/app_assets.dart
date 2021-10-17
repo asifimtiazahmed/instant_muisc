@@ -7,4 +7,5 @@ class AppAssets {
   static const String GOOGLE_LOGO = 'assets/logo/logos_google-icon.png';
   static const String FACEBOOK_LOGO = 'assets/logo/logos_facebook.png';
   static const String APPLE_LOGO = 'assets/logo/appleLogo.png';
+  static const String EMAIL_IMAGE = 'assets/images/email_image.png';
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:instant_music/resources/app_colors.dart';
@@ -31,9 +33,16 @@ class LoginViewModel extends ChangeNotifier {
 
   final authManager = GetIt.I<FirebaseAuthManager>();
   LoginViewModel() {
+    print('auth manager initiated');
     authManager.init();
-    updateUI();
+    print('delaying 2 seconds');
+    initialUIUpdate();
   }
+  initialUIUpdate() async {
+    print('calling update UI');
+    await updateUI();
+  }
+
   @override
   dispose() {
     super.dispose();
@@ -65,8 +74,10 @@ class LoginViewModel extends ChangeNotifier {
     } else if (isEmailValid && isPasswordValid) {
       if (authManager.loginState == ApplicationLoginState.register) {
         register(context);
+        await updateUI();
       } else if (authManager.loginState == ApplicationLoginState.password) {
         login(context);
+        await updateUI();
       } else {
         await updateUI();
       }
@@ -102,13 +113,17 @@ class LoginViewModel extends ChangeNotifier {
   Future<void> inputTextOnSubmitted() async {
     await validateEmail(emailTextController.text);
     validatePassword(passwordTextController.text);
-    verifyPassword(verifyPasswordTextController.text);
+    if (authManager.loginState != ApplicationLoginState.password) {
+      verifyPassword(verifyPasswordTextController.text);
+    }
     print(
         'current status \n isEmailValid: $isEmailValid\n${emailTextController.text}\n\n isPasswordValid: $isPasswordValid\n${passwordTextController.text}\n\n\n\n now calling update UI');
     await updateUI();
   }
 
   Future<void> updateUI() async {
+    print(
+        'UI Update called, the current login state is: ${authManager.loginState}');
     //This method should update everything
     //Initial state
     if (authManager.loginState == ApplicationLoginState.emailAddress ||
@@ -222,6 +237,9 @@ class LoginViewModel extends ChangeNotifier {
       btnTitle = AppStrings.BTN_LOGOUT;
       btnBackgroundColor = AppColors.primary;
       btnTextColor = AppColors.btnText;
+      tagLineFlexValue = 1;
+      buttonFlexValue = 2;
+      showPasswordTextField = false;
     }
     notifyListeners();
   }
@@ -258,11 +276,13 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+// This chceks the TextField input form to see if the email is a valid email format
   bool checkEmail(value) {
     return isEmailValid = EmailValidator.validate(value);
     //print('from check email -> $isEmailValid');
   }
 
+  //This also checks the TextField input form to see if the email is valid using regExpt
   Future<void> validateEmail(value) async {
     Pattern pattern =
         r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]"
@@ -301,17 +321,20 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+//this method logs in existing user, and checks if the email has been validated or not
+// if not it will send you to the email validation page
   void login(BuildContext context) async {
     //  print('login function called');
     if (isEmailValid &&
         isPasswordValid &&
         emailTextController.text.isNotEmpty &&
         passwordTextController.text.isNotEmpty) {
-      authManager.signInWithEmailAndPassword(
+      await authManager.signInWithEmailAndPassword(
           emailTextController.text, passwordTextController.text, (e) {
         print(e);
       });
     }
+    print('logged in now resetting from login function');
     await reset();
     nextRoute(context);
   }
@@ -327,7 +350,7 @@ class LoginViewModel extends ChangeNotifier {
     showTagMesssage = true;
     await updateUI();
 
-    notifyListeners();
+    //notifyListeners();
   }
 
   void viewObscured(String whichField) {
@@ -347,7 +370,7 @@ class LoginViewModel extends ChangeNotifier {
         isPasswordValid &&
         emailTextController.text.isNotEmpty &&
         passwordTextController.text.isNotEmpty) {
-      authManager.registerAccount(
+      await authManager.registerAccount(
           emailTextController.text,
           emailTextController.text.split('@')[0],
           passwordTextController.text, (e) {
@@ -363,12 +386,15 @@ class LoginViewModel extends ChangeNotifier {
   // verified then it will send to email verification page
   //else send to RootAccess
   void nextRoute(BuildContext context) {
+    print('nextRoute called');
     if (authManager.loginState == ApplicationLoginState.loggedIn &&
         authManager.whichLoginMethod() != 'Email') {
+      print('not email');
       Navigator.pushNamed(context, RootScene.routeName);
     } else if (authManager.loginState == ApplicationLoginState.loggedIn &&
         authManager.whichLoginMethod() == 'Email' &&
         !authManager.emailVerified) {
+      print('email');
       Navigator.pushNamed(context, EmailVerifyScene.routeName);
     }
   }
@@ -376,8 +402,9 @@ class LoginViewModel extends ChangeNotifier {
   void logOut() async {
     if (authManager.loginState == ApplicationLoginState.loggedIn) {
       print('signing out user');
-      authManager.sighOut();
+      await authManager.sighOut();
       await reset();
+      await updateUI();
     }
   }
 }

@@ -22,6 +22,7 @@ class FirebaseAuthManager extends ChangeNotifier {
   bool isGoogleSignedIn = false;
   bool isAppleSignedIn = false;
   bool isEmailSignedIn = false;
+  bool isEmailVerified = false;
   bool hasCompletedOnboarding = false;
   final googleSignIn = GoogleSignIn();
   GoogleSignInAccount? _user;
@@ -35,14 +36,19 @@ class FirebaseAuthManager extends ChangeNotifier {
   //Get which method was used to signIn
   String whichLoginMethod() {
     if (isEmailSignedIn) {
+      print('authManage: signed in with email');
       return 'Email';
     } else if (isGoogleSignedIn) {
+      print('authManage: signed in with goolge');
       return 'Google';
     } else if (isFacebookSignedIn) {
+      print('authManage: signed in with facebook');
       return 'Facebook';
     } else if (isAppleSignedIn) {
+      print('authManage: signed in with apple');
       return 'Apple';
     } else {
+      print('authManage: signed in with unknown');
       return 'unknown';
     }
   }
@@ -56,6 +62,7 @@ class FirebaseAuthManager extends ChangeNotifier {
     FirebaseAuth.instance.userChanges().listen((user) {
       print('checking if user exists');
       if (user != null) {
+        isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
         _loginState = ApplicationLoginState.loggedIn;
         print('user found $user');
       } else {
@@ -87,6 +94,7 @@ class FirebaseAuthManager extends ChangeNotifier {
       print('${googleUser.displayName}');
     } catch (e) {
       print('could not sign in with goodle creds, and heres why: \n $e');
+      isGoogleSignedIn = false;
     }
     notifyListeners();
   }
@@ -154,6 +162,7 @@ class FirebaseAuthManager extends ChangeNotifier {
     } else {
       print(result.status);
       print(result.message);
+      isFacebookSignedIn = false;
     }
     notifyListeners();
   }
@@ -171,9 +180,10 @@ class FirebaseAuthManager extends ChangeNotifier {
 
   Future<void> facebookLogOut() async {
     await FacebookAuth.instance.logOut();
+    isFacebookSignedIn = false;
   }
 
-  void signInWithEmailAndPassword(String email, String password,
+  Future<void> signInWithEmailAndPassword(String email, String password,
       void Function(FirebaseAuthException e) errorCallback) async {
     try {
       await FirebaseAuth.instance
@@ -181,6 +191,7 @@ class FirebaseAuthManager extends ChangeNotifier {
       isEmailSignedIn = true;
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
+      isEmailSignedIn = false;
     }
   }
 
@@ -189,7 +200,10 @@ class FirebaseAuthManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void registerAccount(String email, String displayName, String password,
+  Future<void> registerAccount(
+      String email,
+      String displayName,
+      String password,
       void Function(FirebaseAuthException e) errorCallback) async {
     try {
       var credential = await FirebaseAuth.instance
@@ -198,10 +212,11 @@ class FirebaseAuthManager extends ChangeNotifier {
       isEmailSignedIn = true;
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
+      isEmailSignedIn = false;
     }
   }
 
-  void sighOut() async {
+  Future<void> sighOut() async {
     FirebaseAuth.instance.signOut();
     isGoogleSignedIn = false;
     isFacebookSignedIn = false;

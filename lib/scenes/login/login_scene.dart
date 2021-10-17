@@ -6,6 +6,7 @@ import 'package:instant_music/resources/app_colors.dart';
 import 'package:instant_music/resources/app_strings.dart';
 import 'package:instant_music/resources/app_styles.dart';
 import 'package:instant_music/scenes/login/widgets/social_button.dart';
+import 'package:instant_music/services/firebase_auth.dart';
 import 'package:instant_music/widgets/button.dart';
 import 'package:provider/provider.dart';
 import 'login_view_model.dart';
@@ -85,29 +86,34 @@ class LoginScene extends StatelessWidget {
                                 ),
                               ),
                             const SizedBox(height: 10),
-                            TextField(
-                              autocorrect: false,
-                              onChanged: (value) async {
-                                await vm.forContinueButton(value);
-                              },
-                              controller: vm.emailTextController,
-                              onSubmitted: (value) {
-                                vm.inputTextOnSubmitted();
-                                // vm.validateEmail(value);
-                                // vm.updateUI();
-                              },
-                              keyboardType: TextInputType.emailAddress,
-                              decoration: InputDecoration(
-                                hintText: AppStrings.EMAIL,
-                                hintStyle: const TextStyle(
-                                    color: AppColors.inactiveBtnText),
-                                errorText:
-                                    (vm.errorText == '') ? null : vm.errorText,
-                                errorStyle: const TextStyle(
-                                  color: AppColors.accentBusy,
+                            //EMAIL
+                            if (vm.authManager.loginState !=
+                                ApplicationLoginState.loggedIn)
+                              TextField(
+                                autocorrect: false,
+                                onChanged: (value) async {
+                                  await vm.forContinueButton(value);
+                                },
+                                controller: vm.emailTextController,
+                                onSubmitted: (value) {
+                                  vm.inputTextOnSubmitted();
+                                  // vm.validateEmail(value);
+                                  // vm.updateUI();
+                                },
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: InputDecoration(
+                                  hintText: AppStrings.EMAIL,
+                                  hintStyle: const TextStyle(
+                                      color: AppColors.inactiveBtnText),
+                                  errorText: (vm.errorText == '')
+                                      ? null
+                                      : vm.errorText,
+                                  errorStyle: const TextStyle(
+                                    color: AppColors.accentBusy,
+                                  ),
                                 ),
                               ),
-                            ),
+                            //PASSWORD
                             Visibility(
                               visible: vm.showPasswordTextField,
                               child: TextField(
@@ -179,12 +185,15 @@ class LoginScene extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 20),
-                            //CONTINUE
+                            //CONTINUE/SUBMIT BUTTON
                             ActiveButton(
                               title: vm.btnTitle,
                               width: 225,
                               onPressed: () async {
-                                await vm.inputTextOnSubmitted();
+                                if (vm.authManager.loginState !=
+                                    ApplicationLoginState.loggedIn) {
+                                  await vm.inputTextOnSubmitted();
+                                }
                                 vm.submit(context);
                                 //vm.submit
                               },

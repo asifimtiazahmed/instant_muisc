@@ -26,4 +26,11 @@ static const String OR = 'OR';
 static const String GOOGLE = 'Google';
 static const String APPLE = 'Apple';
 static const String FACEBOOK = 'Facebook';
+
+//EMAIL VERIFY PAGE
+static const String VERIFY_EMAIL = 'Verify your email';
+static const String VERIFY_EMAIL_MSG = 'A verification email has been sent to your email inbox';
+static const String DID_NOT_RECV = 'Did not receive?';
+static const String BTN_RESEND = 'Resend email';
+
 }

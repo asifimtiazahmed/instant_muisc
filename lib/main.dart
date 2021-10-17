@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
             ),
             onGenerateRoute: AppRouter.generateRoute,
             initialRoute: AuthenticationGateView.routeName,
-            home: const LoginScene(),
+            //home: const LoginScene(),
           );
         });
   }

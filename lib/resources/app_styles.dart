@@ -5,7 +5,7 @@ class AppStyles {
   static final title =
       TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 0.7);
   static final subTitle =
-      TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1.25);
+      const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1.25);
   static final bodyText =
       TextStyle(fontSize: 16, height: 1.27, color: AppColors.text);
   static const subBodyText =
