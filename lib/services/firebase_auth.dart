@@ -23,10 +23,11 @@ class FirebaseAuthManager extends ChangeNotifier {
   bool isAppleSignedIn = false;
   bool isEmailSignedIn = false;
   bool isEmailVerified = false;
-  bool hasCompletedOnboarding = false;
+  bool hasCompletedOnboarding = true;
   final googleSignIn = GoogleSignIn();
   GoogleSignInAccount? _user;
   GoogleSignInAccount get user => _user!;
+  late User? firebaseUser;
 
   //METHODS
   FirebaseAuthManager() {
@@ -65,6 +66,9 @@ class FirebaseAuthManager extends ChangeNotifier {
         isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
         _loginState = ApplicationLoginState.loggedIn;
         print('user found $user');
+        //Checking if the email has been verified and setting the value
+        checkEmailVerification();
+        firebaseUser = user;
       } else {
         _loginState = ApplicationLoginState.loggedOut;
         print('user not found');
@@ -200,6 +204,27 @@ class FirebaseAuthManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  void sendEmailVerificationEmail() {
+    final cUser = FirebaseAuth.instance.currentUser;
+    try {
+      print('${cUser?.emailVerified}');
+      if (cUser?.emailVerified == false) {
+        cUser?.sendEmailVerification();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void checkEmailVerification() {
+    final cUser = FirebaseAuth.instance.currentUser;
+    (cUser?.emailVerified == false)
+        ? isEmailVerified = false
+        : isEmailVerified = true;
+    print('email verification status == ${cUser?.emailVerified}');
+    //notifyListeners();
+  }
+
   Future<void> registerAccount(
       String email,
       String displayName,
@@ -210,6 +235,8 @@ class FirebaseAuthManager extends ChangeNotifier {
           .createUserWithEmailAndPassword(email: email, password: password);
       await credential.user!.updateDisplayName(displayName);
       isEmailSignedIn = true;
+      //Send for email verfication
+      sendEmailVerificationEmail();
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
       isEmailSignedIn = false;
@@ -230,5 +257,6 @@ class FirebaseAuthManager extends ChangeNotifier {
     }
 
     _loginState = ApplicationLoginState.loggedOut;
+    notifyListeners();
   }
 }

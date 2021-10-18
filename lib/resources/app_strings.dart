@@ -32,5 +32,6 @@ static const String VERIFY_EMAIL = 'Verify your email';
 static const String VERIFY_EMAIL_MSG = 'A verification email has been sent to your email inbox';
 static const String DID_NOT_RECV = 'Did not receive?';
 static const String BTN_RESEND = 'Resend email';
+static const String CHECKING = 'checking if email is verified . . . ';
 
 }

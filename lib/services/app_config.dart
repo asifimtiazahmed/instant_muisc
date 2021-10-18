@@ -11,6 +11,7 @@ class AppConfig {
         true; //Might help with Jank see flutter 1.22 release notes
 
     // Register your Singletons
+
     GetIt.I.registerSingleton<FirebaseAuthManager>(
         FirebaseAuthManager()); // It has to be the first because other Singletons might use it.
 //    GetIt.I.registerSingleton<AuthManager>(AuthManager());

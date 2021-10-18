@@ -20,6 +20,8 @@ class LoginScene extends StatelessWidget {
     final scrSize = MediaQuery.of(context).size;
     return Consumer<LoginViewModel>(
       builder: (context, vm, child) {
+        vm.ctx =
+            context; //sending off the context copy for routing through the view model
         return Scaffold(
           backgroundColor: AppColors.background,
           body: SafeArea(
@@ -148,6 +150,7 @@ class LoginScene extends StatelessWidget {
                                 obscureText: vm.passwordObscured,
                               ),
                             ),
+                            //TODO: Add a forgot password? option here
                             //VERIFY PASSWORD
                             Visibility(
                               visible: vm.showPasswordVerifyTextField,

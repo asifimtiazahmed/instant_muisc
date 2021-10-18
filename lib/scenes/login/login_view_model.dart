@@ -10,6 +10,7 @@ import 'package:instant_music/services/firebase_auth.dart';
 import 'package:email_validator/email_validator.dart';
 
 class LoginViewModel extends ChangeNotifier {
+  late BuildContext ctx;
   final emailTextController = TextEditingController();
   final passwordTextController = TextEditingController();
   final verifyPasswordTextController = TextEditingController();
@@ -31,16 +32,22 @@ class LoginViewModel extends ChangeNotifier {
   bool showPasswordTextField = false;
   bool showPasswordVerifyTextField = false;
 
+  //TODO: Add a password reset option here
   final authManager = GetIt.I<FirebaseAuthManager>();
   LoginViewModel() {
     print('auth manager initiated');
-    authManager.init();
-    print('delaying 2 seconds');
+
     initialUIUpdate();
   }
   initialUIUpdate() async {
-    print('calling update UI');
+    print('calling authManager init again and waiting');
+    await authManager.init();
+    print('now calling calling authManager init again and waiting');
     await updateUI();
+    //await authManager.sighOut();
+    if (authManager.loginState == ApplicationLoginState.loggedIn) {
+      nextRoute(ctx);
+    }
   }
 
   @override
@@ -390,12 +397,12 @@ class LoginViewModel extends ChangeNotifier {
     if (authManager.loginState == ApplicationLoginState.loggedIn &&
         authManager.whichLoginMethod() != 'Email') {
       print('not email');
-      Navigator.pushNamed(context, RootScene.routeName);
+      Navigator.pushReplacementNamed(context, RootScene.routeName);
     } else if (authManager.loginState == ApplicationLoginState.loggedIn &&
         authManager.whichLoginMethod() == 'Email' &&
         !authManager.emailVerified) {
       print('email');
-      Navigator.pushNamed(context, EmailVerifyScene.routeName);
+      Navigator.pushReplacementNamed(context, EmailVerifyScene.routeName);
     }
   }
 
