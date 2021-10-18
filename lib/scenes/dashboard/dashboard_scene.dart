@@ -9,7 +9,11 @@ class DashboardScene extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(),
+        child: Column(
+          children: const [
+            Text('Dashboard view'),
+          ],
+        ),
       ),
     );
   }
